@@ -155,13 +155,11 @@ public class LogDaoLocalImpl implements LogDao {
                 return;
             } else if (requestBody.contains(AuthTypeEnum.EMAIL.getValue())) {
                 EmailLoginReq authReq = JSONUtil.toBean(requestBody, EmailLoginReq.class);
-                logDO.setCreateUser(ExceptionUtils.exToNull(() -> userService.getByEmail(authReq.getEmail())
-                        .getId()));
+                logDO.setCreateUser(ExceptionUtils.exToNull(() -> userService.getByEmail(authReq.getEmail()).getId()));
                 return;
             } else if (requestBody.contains(AuthTypeEnum.PHONE.getValue())) {
                 PhoneLoginReq authReq = JSONUtil.toBean(requestBody, PhoneLoginReq.class);
-                logDO.setCreateUser(ExceptionUtils.exToNull(() -> userService.getByPhone(authReq.getPhone())
-                        .getId()));
+                logDO.setCreateUser(ExceptionUtils.exToNull(() -> userService.getByPhone(authReq.getPhone()).getId()));
                 return;
             }
         }

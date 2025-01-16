@@ -24,9 +24,9 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 import top.continew.admin.common.constant.RegexConstants;
 import top.continew.admin.common.enums.DataScopeEnum;
-import top.continew.starter.extension.crud.model.req.BaseReq;
 
 import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +38,7 @@ import java.util.List;
  */
 @Data
 @Schema(description = "创建或修改角色参数")
-public class RoleReq extends BaseReq {
+public class RoleReq implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

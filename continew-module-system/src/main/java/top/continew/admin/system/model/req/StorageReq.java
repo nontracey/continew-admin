@@ -26,9 +26,9 @@ import top.continew.admin.common.constant.RegexConstants;
 import top.continew.admin.common.enums.DisEnableStatusEnum;
 import top.continew.admin.system.enums.StorageTypeEnum;
 import top.continew.admin.system.validation.ValidationGroup;
-import top.continew.starter.extension.crud.model.req.BaseReq;
 
 import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * 存储请求参数
@@ -38,7 +38,7 @@ import java.io.Serial;
  */
 @Data
 @Schema(description = "存储请求参数")
-public class StorageReq extends BaseReq {
+public class StorageReq implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

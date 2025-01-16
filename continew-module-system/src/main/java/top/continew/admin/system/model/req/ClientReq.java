@@ -22,9 +22,9 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 import top.continew.admin.common.enums.DisEnableStatusEnum;
-import top.continew.starter.extension.crud.model.req.BaseReq;
 
 import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -36,7 +36,7 @@ import java.util.List;
  */
 @Data
 @Schema(description = "创建或修改客户端参数")
-public class ClientReq extends BaseReq {
+public class ClientReq implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
