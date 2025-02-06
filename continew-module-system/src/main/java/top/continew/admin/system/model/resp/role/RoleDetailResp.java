@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package top.continew.admin.system.model.resp;
+package top.continew.admin.system.model.resp.role;
 
 import cn.crane4j.annotation.AssembleMethod;
 import cn.crane4j.annotation.ContainerMethod;

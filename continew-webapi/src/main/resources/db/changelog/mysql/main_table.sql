@@ -119,9 +119,11 @@ CREATE TABLE IF NOT EXISTS `sys_user_social` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户社会化关联表';
 
 CREATE TABLE IF NOT EXISTS `sys_user_role` (
+    `id`      bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'ID',
     `user_id` bigint(20) NOT NULL COMMENT '用户ID',
     `role_id` bigint(20) NOT NULL COMMENT '角色ID',
-    PRIMARY KEY (`user_id`, `role_id`)
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `uk_user_id_role_id`(`user_id`, `role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户和角色关联表';
 
 CREATE TABLE IF NOT EXISTS `sys_role_menu` (

@@ -14,48 +14,44 @@
  * limitations under the License.
  */
 
-package top.continew.admin.system.model.entity;
+package top.continew.admin.system.model.req;
 
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * 用户和角色实体
+ * 修改角色功能权限参数
  *
  * @author Charles7c
- * @since 2023/2/13 23:13
+ * @since 2025/2/5 21:00
  */
 @Data
-@NoArgsConstructor
-@TableName("sys_user_role")
-public class UserRoleDO implements Serializable {
+@Schema(description = "修改角色功能权限参数")
+public class RoleUpdatePermissionReq implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     /**
-     * ID
-     */
-    @TableId
-    private Long id;
-
-    /**
-     * 用户 ID
-     */
-    private Long userId;
-
-    /**
      * 角色 ID
      */
+    @Schema(description = "角色 ID", example = "1")
     private Long roleId;
 
-    public UserRoleDO(Long userId, Long roleId) {
-        this.userId = userId;
-        this.roleId = roleId;
-    }
+    /**
+     * 功能权限：菜单 ID 列表
+     */
+    @Schema(description = "功能权限：菜单 ID 列表", example = "1000,1010,1011,1012,1013,1014")
+    private List<Long> menuIds = new ArrayList<>();
+
+    /**
+     * 菜单选择是否父子节点关联
+     */
+    @Schema(description = "菜单选择是否父子节点关联", example = "false")
+    private Boolean menuCheckStrictly;
 }

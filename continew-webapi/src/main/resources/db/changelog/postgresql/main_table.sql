@@ -197,10 +197,13 @@ COMMENT ON COLUMN "sys_user_social"."create_time"     IS '创建时间';
 COMMENT ON TABLE  "sys_user_social"                   IS '用户社会化关联表';
 
 CREATE TABLE IF NOT EXISTS "sys_user_role" (
+    "id"      int8 NOT NULL,
     "user_id" int8 NOT NULL,
     "role_id" int8 NOT NULL,
-    PRIMARY KEY ("user_id", "role_id")
+    PRIMARY KEY ("id")
 );
+CREATE UNIQUE INDEX "uk_user_id_role_id" ON "sys_user_role" ("user_id", "role_id");
+COMMENT ON COLUMN "sys_user_role"."id"      IS 'ID';
 COMMENT ON COLUMN "sys_user_role"."user_id" IS '用户ID';
 COMMENT ON COLUMN "sys_user_role"."role_id" IS '角色ID';
 COMMENT ON TABLE  "sys_user_role"           IS '用户和角色关联表';

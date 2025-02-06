@@ -488,6 +488,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, UserDO, UserRes
         List<Date> createTimeList = query.getCreateTime();
         Long deptId = query.getDeptId();
         List<Long> userIdList = query.getUserIds();
+        List<Long> excludeUserIdList = query.getExcludeUserIds();
         return new QueryWrapper<UserDO>().and(StrUtil.isNotBlank(description), q -> q.like("t1.username", description)
             .or()
             .like("t1.nickname", description)
@@ -504,7 +505,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, UserDO, UserRes
                 deptIdList.add(deptId);
                 q.in("t1.dept_id", deptIdList);
             })
-            .in(CollUtil.isNotEmpty(userIdList), "t1.id", userIdList);
+            .in(CollUtil.isNotEmpty(userIdList), "t1.id", userIdList)
+            .notIn(CollUtil.isNotEmpty(excludeUserIdList), "t1.id", excludeUserIdList);
     }
 
     /**

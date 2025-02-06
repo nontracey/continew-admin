@@ -14,48 +14,36 @@
  * limitations under the License.
  */
 
-package top.continew.admin.system.model.entity;
+package top.continew.admin.system.model.query;
 
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 用户和角色实体
+ * 角色关联用户查询条件
  *
  * @author Charles7c
- * @since 2023/2/13 23:13
+ * @since 2025/2/5 22:01
  */
 @Data
-@NoArgsConstructor
-@TableName("sys_user_role")
-public class UserRoleDO implements Serializable {
+@Schema(description = "角色关联用户查询条件")
+public class RoleUserQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     /**
-     * ID
-     */
-    @TableId
-    private Long id;
-
-    /**
-     * 用户 ID
-     */
-    private Long userId;
-
-    /**
      * 角色 ID
      */
+    @Schema(description = "角色 ID", example = "1")
     private Long roleId;
 
-    public UserRoleDO(Long userId, Long roleId) {
-        this.userId = userId;
-        this.roleId = roleId;
-    }
+    /**
+     * 关键词
+     */
+    @Schema(description = "关键词", example = "zhangsan")
+    private String description;
 }

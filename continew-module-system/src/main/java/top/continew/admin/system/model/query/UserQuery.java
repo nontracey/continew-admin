@@ -72,4 +72,10 @@ public class UserQuery implements Serializable {
      */
     @Schema(description = "用户 ID 列表", example = "[1,2,3]")
     private List<Long> userIds;
+
+    /**
+     * 不包含的用户 ID 列表
+     */
+    @Schema(description = "不包含的用户 ID 列表", example = "[1,2]")
+    private List<Long> excludeUserIds;
 }
