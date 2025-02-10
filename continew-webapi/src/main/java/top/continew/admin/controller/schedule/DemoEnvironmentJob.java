@@ -30,6 +30,7 @@ import top.continew.admin.open.model.entity.AppDO;
 import top.continew.admin.system.mapper.*;
 import top.continew.admin.system.model.entity.*;
 import top.continew.starter.cache.redisson.util.RedisUtils;
+import top.continew.starter.core.constant.StringConstants;
 
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -169,7 +170,7 @@ public class DemoEnvironmentJob {
         if (count > 0 && supplier.getAsBoolean()) {
             SnailJobLog.REMOTE.info("[{}] 数据项清理完成。", resource);
             if (StrUtil.isNotBlank(cacheKey)) {
-                RedisUtils.deleteByPattern(cacheKey);
+                RedisUtils.deleteByPattern(cacheKey + StringConstants.ASTERISK);
                 SnailJobLog.REMOTE.info("[{}] 数据项缓存清理完成。", resource);
             }
         }
