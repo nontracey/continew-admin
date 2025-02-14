@@ -20,13 +20,11 @@ import cn.crane4j.annotation.AutoOperate;
 import cn.crane4j.annotation.ContainerMethod;
 import cn.crane4j.annotation.MappingType;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import top.continew.admin.common.constant.ContainerConstants;
@@ -37,6 +35,7 @@ import top.continew.admin.system.model.query.RoleUserQuery;
 import top.continew.admin.system.model.resp.role.RoleUserResp;
 import top.continew.admin.system.service.UserRoleService;
 import top.continew.starter.core.validation.CheckUtils;
+import top.continew.starter.data.mp.util.QueryWrapperHelper;
 import top.continew.starter.extension.crud.model.query.PageQuery;
 import top.continew.starter.extension.crud.model.resp.PageResp;
 
@@ -64,13 +63,7 @@ public class UserRoleServiceImpl implements UserRoleService {
                 .like("t2.nickname", description)
                 .or()
                 .like("t2.description", description));
-        // 排序
-        if (!pageQuery.getSort().isUnsorted()) {
-            for (Sort.Order order : pageQuery.getSort()) {
-                String property = order.getProperty();
-                queryWrapper.orderBy(true, order.isAscending(), CharSequenceUtil.toUnderlineCase(property));
-            }
-        }
+        QueryWrapperHelper.sort(queryWrapper, pageQuery.getSort());
         IPage<RoleUserResp> page = baseMapper.selectUserPage(new Page<>(pageQuery.getPage(), pageQuery
             .getSize()), queryWrapper);
         return PageResp.build(page);
