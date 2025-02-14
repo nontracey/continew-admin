@@ -488,7 +488,11 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, UserDO, UserRes
         List<Date> createTimeList = query.getCreateTime();
         Long deptId = query.getDeptId();
         List<Long> userIdList = query.getUserIds();
-        List<Long> excludeUserIdList = query.getExcludeUserIds();
+        // 获取排除用户 ID 列表
+        List<Long> excludeUserIdList = null;
+        if (null != query.getRoleId()) {
+            excludeUserIdList = userRoleService.listUserIdByRoleId(query.getRoleId());
+        }
         return new QueryWrapper<UserDO>().and(StrUtil.isNotBlank(description), q -> q.like("t1.username", description)
             .or()
             .like("t1.nickname", description)

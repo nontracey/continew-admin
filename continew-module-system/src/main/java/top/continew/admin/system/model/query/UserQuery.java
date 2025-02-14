@@ -74,8 +74,9 @@ public class UserQuery implements Serializable {
     private List<Long> userIds;
 
     /**
-     * 不包含的用户 ID 列表
+     * 角色 ID
+     * <p>用于在角色授权用户时，过滤掉已经分配给该角色的用户</p>
      */
-    @Schema(description = "不包含的用户 ID 列表", example = "[1,2]")
-    private List<Long> excludeUserIds;
+    @Schema(description = "角色 ID", example = "1")
+    private Long roleId;
 }
