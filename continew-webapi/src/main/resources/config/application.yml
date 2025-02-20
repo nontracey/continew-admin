@@ -141,6 +141,8 @@ sa-token:
   is-share: false
   # 是否输出操作日志
   is-log: false
+  # 是否启用动态 activeTimeout 功能
+  dynamic-active-timeout: true
   # JWT 秘钥
   jwt-secret-key: asdasdasifhueuiwyurfewbfjsdafjk
   ## 扩展配置
