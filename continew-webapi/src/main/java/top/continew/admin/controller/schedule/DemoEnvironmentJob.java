@@ -47,7 +47,6 @@ public class DemoEnvironmentJob {
 
     private final DictItemMapper dictItemMapper;
     private final DictMapper dictMapper;
-    private final StorageMapper storageMapper;
     private final NoticeMapper noticeMapper;
     private final MessageMapper messageMapper;
     private final MessageUserMapper messageUserMapper;
@@ -84,8 +83,6 @@ public class DemoEnvironmentJob {
             this.log(dictItemCount, "字典项");
             Long dictCount = dictMapper.lambdaQuery().gt(DictDO::getId, DELETE_FLAG).count();
             this.log(dictCount, "字典");
-            Long storageCount = storageMapper.lambdaQuery().gt(StorageDO::getId, DELETE_FLAG).count();
-            this.log(storageCount, "存储");
             Long noticeCount = noticeMapper.lambdaQuery().gt(NoticeDO::getId, DELETE_FLAG).count();
             this.log(noticeCount, "公告");
             Long messageCount = messageMapper.lambdaQuery().count();
@@ -110,9 +107,6 @@ public class DemoEnvironmentJob {
                 .remove());
             this.clean(dictCount, "字典", CacheConstants.DICT_KEY_PREFIX, () -> dictMapper.lambdaUpdate()
                 .gt(DictDO::getId, DELETE_FLAG)
-                .remove());
-            this.clean(storageCount, "存储", null, () -> storageMapper.lambdaUpdate()
-                .gt(StorageDO::getId, DELETE_FLAG)
                 .remove());
             this.clean(noticeCount, "公告", null, () -> noticeMapper.lambdaUpdate()
                 .gt(NoticeDO::getId, DELETE_FLAG)

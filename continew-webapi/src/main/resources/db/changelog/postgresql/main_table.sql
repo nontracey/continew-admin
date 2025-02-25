@@ -312,7 +312,7 @@ CREATE TABLE IF NOT EXISTS "sys_log" (
     "id"               int8         NOT NULL,
     "trace_id"         varchar(255) DEFAULT NULL,
     "description"      varchar(255) NOT NULL,
-    "module"           varchar(50)  NOT NULL,
+    "module"           varchar(100) NOT NULL,
     "request_url"      varchar(512) NOT NULL,
     "request_method"   varchar(10)  NOT NULL,
     "request_headers"  text         DEFAULT NULL,
@@ -420,47 +420,6 @@ COMMENT ON COLUMN "sys_notice"."update_user"    IS '修改人';
 COMMENT ON COLUMN "sys_notice"."update_time"    IS '修改时间';
 COMMENT ON TABLE  "sys_notice"                  IS '公告表';
 
-CREATE TABLE IF NOT EXISTS "sys_storage" (
-    "id"          int8         NOT NULL,
-    "name"        varchar(100) NOT NULL,
-    "code"        varchar(30)  NOT NULL,
-    "type"        int2         NOT NULL DEFAULT 1,
-    "access_key"  varchar(255) DEFAULT NULL,
-    "secret_key"  varchar(255) DEFAULT NULL,
-    "endpoint"    varchar(255) DEFAULT NULL,
-    "bucket_name" varchar(255) DEFAULT NULL,
-    "domain"      varchar(255) NOT NULL DEFAULT '',
-    "description" varchar(200) DEFAULT NULL,
-    "is_default"  bool         NOT NULL DEFAULT false,
-    "sort"        int4         NOT NULL DEFAULT 999,
-    "status"      int2         NOT NULL DEFAULT 1,
-    "create_user" int8         NOT NULL,
-    "create_time" timestamp    NOT NULL,
-    "update_user" int8         DEFAULT NULL,
-    "update_time" timestamp    DEFAULT NULL,
-    PRIMARY KEY ("id")
-);
-CREATE UNIQUE INDEX "uk_storage_code"  ON "sys_storage" ("code");
-CREATE INDEX "idx_storage_create_user" ON "sys_storage" ("create_user");
-CREATE INDEX "idx_storage_update_user" ON "sys_storage" ("update_user");
-COMMENT ON COLUMN "sys_storage"."id"          IS 'ID';
-COMMENT ON COLUMN "sys_storage"."name"        IS '名称';
-COMMENT ON COLUMN "sys_storage"."code"        IS '编码';
-COMMENT ON COLUMN "sys_storage"."type"        IS '类型（1：兼容S3协议存储；2：本地存储）';
-COMMENT ON COLUMN "sys_storage"."access_key"  IS 'Access Key（访问密钥）';
-COMMENT ON COLUMN "sys_storage"."secret_key"  IS 'Secret Key（私有密钥）';
-COMMENT ON COLUMN "sys_storage"."endpoint"    IS 'Endpoint（终端节点）';
-COMMENT ON COLUMN "sys_storage"."bucket_name" IS '桶名称';
-COMMENT ON COLUMN "sys_storage"."domain"      IS '域名';
-COMMENT ON COLUMN "sys_storage"."description" IS '描述';
-COMMENT ON COLUMN "sys_storage"."is_default"  IS '是否为默认存储';
-COMMENT ON COLUMN "sys_storage"."sort"        IS '排序';
-COMMENT ON COLUMN "sys_storage"."status"      IS '状态（1：启用；2：禁用）';
-COMMENT ON COLUMN "sys_storage"."create_user" IS '创建人';
-COMMENT ON COLUMN "sys_storage"."create_time" IS '创建时间';
-COMMENT ON COLUMN "sys_storage"."update_user" IS '修改人';
-COMMENT ON COLUMN "sys_storage"."update_time" IS '修改时间';
-COMMENT ON TABLE  "sys_storage"               IS '存储表';
 
 CREATE TABLE IF NOT EXISTS "sys_file" (
     "id"             int8         NOT NULL,
@@ -471,15 +430,19 @@ CREATE TABLE IF NOT EXISTS "sys_file" (
     "thumbnail_size" int8         DEFAULT NULL,
     "thumbnail_url"  varchar(512) DEFAULT NULL,
     "type"           int2         NOT NULL DEFAULT 1,
-    "storage_id"     int8         NOT NULL,
     "create_user"    int8         NOT NULL,
     "create_time"    timestamp    NOT NULL,
     "update_user"    int8         NOT NULL,
     "update_time"    timestamp    NOT NULL,
+    "e_tag"          varchar(100) DEFAULT NULL,
+    "storage_code"   varchar(255) DEFAULT NULL,
+    "bucket_name"    varchar(255) DEFAULT NULL,
+    "path"           varchar(512) DEFAULT NULL,
     PRIMARY KEY ("id")
 );
 CREATE INDEX "idx_file_url"  ON "sys_file" ("url");
 CREATE INDEX "idx_file_type" ON "sys_file" ("type");
+CREATE INDEX "idx_file_storage_code" ON "sys_file" ("storage_code");
 CREATE INDEX "idx_file_create_user" ON "sys_file" ("create_user");
 CREATE INDEX "idx_file_update_user" ON "sys_file" ("update_user");
 COMMENT ON COLUMN "sys_file"."id"             IS 'ID';
@@ -490,11 +453,14 @@ COMMENT ON COLUMN "sys_file"."extension"      IS '扩展名';
 COMMENT ON COLUMN "sys_file"."thumbnail_size" IS '缩略图大小（字节)';
 COMMENT ON COLUMN "sys_file"."thumbnail_url"  IS '缩略图URL';
 COMMENT ON COLUMN "sys_file"."type"           IS '类型（1：其他；2：图片；3：文档；4：视频；5：音频）';
-COMMENT ON COLUMN "sys_file"."storage_id"     IS '存储ID';
 COMMENT ON COLUMN "sys_file"."create_user"    IS '创建人';
 COMMENT ON COLUMN "sys_file"."create_time"    IS '创建时间';
 COMMENT ON COLUMN "sys_file"."update_user"    IS '修改人';
 COMMENT ON COLUMN "sys_file"."update_time"    IS '修改时间';
+COMMENT ON COLUMN "sys_file"."e_tag"          IS '文件唯一标识';
+COMMENT ON COLUMN "sys_file"."storage_code"   IS '存储唯一标识';
+COMMENT ON COLUMN "sys_file"."bucket_name"    IS '存储桶名称';
+COMMENT ON COLUMN "sys_file"."path"           IS '基础路径';
 COMMENT ON TABLE  "sys_file"                  IS '文件表';
 
 CREATE TABLE IF NOT EXISTS "sys_client" (

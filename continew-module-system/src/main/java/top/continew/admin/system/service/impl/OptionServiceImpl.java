@@ -26,6 +26,7 @@ import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWra
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import top.continew.admin.common.constant.CacheConstants;
+import top.continew.admin.system.config.file.FileStorageInit;
 import top.continew.admin.system.enums.OptionCategoryEnum;
 import top.continew.admin.system.enums.PasswordPolicyEnum;
 import top.continew.admin.system.mapper.OptionMapper;
@@ -57,6 +58,7 @@ import java.util.stream.Collectors;
 public class OptionServiceImpl implements OptionService {
 
     private final OptionMapper baseMapper;
+    private final FileStorageInit fileStorageInit;
 
     @Override
     public List<OptionResp> list(OptionQuery query) {
@@ -98,6 +100,7 @@ public class OptionServiceImpl implements OptionService {
             PasswordPolicyEnum passwordPolicy = PasswordPolicyEnum.valueOf(code);
             passwordPolicy.validateRange(Integer.parseInt(value), passwordPolicyOptionMap);
         }
+        storageReload(options);
         RedisUtils.deleteByPattern(CacheConstants.OPTION_KEY_PREFIX + StringConstants.ASTERISK);
         baseMapper.updateById(BeanUtil.copyToList(options, OptionDO.class));
     }
@@ -137,5 +140,19 @@ public class OptionServiceImpl implements OptionService {
         CheckUtils.throwIfBlank(value, "参数 [{}] 数据错误", code);
         RedisUtils.set(CacheConstants.OPTION_KEY_PREFIX + code, value);
         return mapper.apply(value);
+    }
+
+    /**
+     * 存储重新加载
+     *
+     * @param options 选项
+     */
+    private void storageReload(List<OptionReq> options) {
+        Map<String, String> storage = options.stream()
+            .filter(option -> option.getCode() != null && option.getCode().startsWith("STORAGE_"))
+            .collect(Collectors.toMap(OptionReq::getCode, OptionReq::getValue));
+        if (ObjectUtil.isNotEmpty(storage)) {
+            fileStorageInit.load(storage);
+        }
     }
 }

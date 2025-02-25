@@ -16,13 +16,13 @@
 
 package top.continew.admin.system.service;
 
-import org.dromara.x.file.storage.core.FileInfo;
 import org.springframework.web.multipart.MultipartFile;
 import top.continew.admin.system.model.entity.FileDO;
 import top.continew.admin.system.model.query.FileQuery;
 import top.continew.admin.system.model.req.FileReq;
 import top.continew.admin.system.model.resp.FileResp;
 import top.continew.admin.system.model.resp.FileStatisticsResp;
+import top.continew.admin.system.model.resp.FileUploadResp;
 import top.continew.starter.data.mp.service.IService;
 import top.continew.starter.extension.crud.service.BaseService;
 
@@ -42,7 +42,7 @@ public interface FileService extends BaseService<FileResp, FileResp, FileQuery, 
      * @param file 文件信息
      * @return 文件信息
      */
-    default FileInfo upload(MultipartFile file) {
+    default FileUploadResp upload(MultipartFile file) {
         return upload(file, null);
     }
 
@@ -53,7 +53,7 @@ public interface FileService extends BaseService<FileResp, FileResp, FileQuery, 
      * @param storageCode 存储编码
      * @return 文件信息
      */
-    FileInfo upload(MultipartFile file, String storageCode);
+    FileUploadResp upload(MultipartFile file, String storageCode);
 
     /**
      * 根据存储 ID 列表查询

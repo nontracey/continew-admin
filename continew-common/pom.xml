@@ -29,19 +29,6 @@
             <artifactId>sms4j-spring-boot-starter</artifactId>
         </dependency>
 
-        <!-- X File Storage（一行代码将文件存储到本地、FTP、SFTP、WebDAV、阿里云 OSS、华为云 OBS...等其它兼容 S3 协议的存储平台） -->
-        <dependency>
-            <groupId>org.dromara.x-file-storage</groupId>
-            <artifactId>x-file-storage-spring</artifactId>
-            <version>2.2.1</version>
-        </dependency>
-        <!-- Amazon S3（Amazon Simple Storage Service，亚马逊简单存储服务，通用存储协议 S3，兼容主流云厂商对象存储） -->
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.12.780</version>
-        </dependency>
-
         <!-- FreeMarker（模板引擎） -->
         <dependency>
             <groupId>org.freemarker</groupId>
@@ -148,6 +135,20 @@
         <dependency>
             <groupId>top.continew</groupId>
             <artifactId>continew-starter-json-jackson</artifactId>
+        </dependency>
+
+
+        <!-- ContiNew Starter 存储模块 - 本地存储 -->
+        <dependency>
+            <groupId>top.continew</groupId>
+            <artifactId>continew-starter-storage-local</artifactId>
+        </dependency>
+
+
+        <!-- ContiNew Starter 存储模块 - 对象存储 -->
+        <dependency>
+            <groupId>top.continew</groupId>
+            <artifactId>continew-starter-storage-oss</artifactId>
         </dependency>
     </dependencies>
 </project>

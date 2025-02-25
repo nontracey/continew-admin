@@ -26,7 +26,6 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.dromara.x.file.storage.core.FileInfo;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -66,9 +65,9 @@ public class CommonController {
 
     @Operation(summary = "上传文件", description = "上传文件")
     @PostMapping("/file")
-    public FileUploadResp upload(@NotNull(message = "文件不能为空") MultipartFile file) {
+    public FileUploadResp upload(@NotNull(message = "文件不能为空") @RequestPart("file") MultipartFile file) {
         ValidationUtils.throwIf(file::isEmpty, "文件不能为空");
-        FileInfo fileInfo = fileService.upload(file);
+        FileUploadResp fileInfo = fileService.upload(file);
         return FileUploadResp.builder().url(fileInfo.getUrl()).build();
     }
 

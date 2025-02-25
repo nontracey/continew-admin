@@ -43,4 +43,9 @@ public enum OptionCategoryEnum {
      * 登录配置
      */
     LOGIN,
+
+    /**
+     * 存储配置
+     */
+    STORAGE,;
 }

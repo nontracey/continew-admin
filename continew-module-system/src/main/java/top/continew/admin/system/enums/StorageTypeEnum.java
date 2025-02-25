@@ -31,9 +31,9 @@ import top.continew.starter.core.enums.BaseEnum;
 public enum StorageTypeEnum implements BaseEnum<Integer> {
 
     /**
-     * 兼容S3协议存储
+     * 对象存储
      */
-    S3(1, "兼容S3协议存储"),
+    OSS(1, "对象存储"),
 
     /**
      * 本地存储

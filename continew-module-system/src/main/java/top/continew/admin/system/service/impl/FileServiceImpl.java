@@ -17,39 +17,27 @@
 package top.continew.admin.system.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.io.file.FileNameUtil;
-import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.core.util.URLUtil;
-import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.dromara.x.file.storage.core.FileInfo;
-import org.dromara.x.file.storage.core.FileStorageService;
-import org.dromara.x.file.storage.core.ProgressListener;
-import org.dromara.x.file.storage.core.upload.UploadPretreatment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import top.continew.admin.system.enums.FileTypeEnum;
 import top.continew.admin.system.mapper.FileMapper;
 import top.continew.admin.system.model.entity.FileDO;
-import top.continew.admin.system.model.entity.StorageDO;
 import top.continew.admin.system.model.query.FileQuery;
 import top.continew.admin.system.model.req.FileReq;
 import top.continew.admin.system.model.resp.FileResp;
 import top.continew.admin.system.model.resp.FileStatisticsResp;
+import top.continew.admin.system.model.resp.FileUploadResp;
 import top.continew.admin.system.service.FileService;
-import top.continew.admin.system.service.StorageService;
-import top.continew.starter.core.constant.StringConstants;
-import top.continew.starter.core.util.StrUtils;
-import top.continew.starter.core.util.URLUtils;
-import top.continew.starter.core.validation.CheckUtils;
+import top.continew.starter.core.exception.BusinessException;
 import top.continew.starter.extension.crud.service.BaseServiceImpl;
+import top.continew.starter.storage.manger.StorageManager;
+import top.continew.starter.storage.model.resp.UploadResp;
+import top.continew.starter.storage.strategy.StorageStrategy;
 
-import java.time.LocalDate;
+import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * 文件业务实现
@@ -62,65 +50,31 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class FileServiceImpl extends BaseServiceImpl<FileMapper, FileDO, FileResp, FileResp, FileQuery, FileReq> implements FileService {
 
-    private final FileStorageService fileStorageService;
-    @Resource
-    private StorageService storageService;
-
     @Override
     protected void beforeDelete(List<Long> ids) {
         List<FileDO> fileList = baseMapper.lambdaQuery().in(FileDO::getId, ids).list();
-        Map<Long, List<FileDO>> fileListGroup = fileList.stream().collect(Collectors.groupingBy(FileDO::getStorageId));
-        for (Map.Entry<Long, List<FileDO>> entry : fileListGroup.entrySet()) {
-            StorageDO storage = storageService.getById(entry.getKey());
-            for (FileDO file : entry.getValue()) {
-                FileInfo fileInfo = file.toFileInfo(storage);
-                fileStorageService.delete(fileInfo);
-            }
-        }
+        fileList.forEach(file -> {
+            StorageStrategy<?> instance = StorageManager.instance(file.getStorageCode());
+            instance.delete(file.getBucketName(), file.getPath());
+        });
     }
 
     @Override
-    public FileInfo upload(MultipartFile file, String storageCode) {
-        StorageDO storage;
+    public FileUploadResp upload(MultipartFile file, String storageCode) {
+        StorageStrategy<?> instance;
         if (StrUtil.isBlank(storageCode)) {
-            storage = storageService.getDefaultStorage();
-            CheckUtils.throwIfNull(storage, "请先指定默认存储");
+            instance = StorageManager.instance();
         } else {
-            storage = storageService.getByCode(storageCode);
-            CheckUtils.throwIfNotExists(storage, "StorageDO", "Code", storageCode);
+            instance = StorageManager.instance(storageCode);
         }
-        LocalDate today = LocalDate.now();
-        String path = today.getYear() + StringConstants.SLASH + today.getMonthValue() + StringConstants.SLASH + today
-            .getDayOfMonth() + StringConstants.SLASH;
-        UploadPretreatment uploadPretreatment = fileStorageService.of(file)
-            .setPlatform(storage.getCode())
-            .putAttr(ClassUtil.getClassName(StorageDO.class, false), storage)
-            .setPath(path);
-        // 图片文件生成缩略图
-        if (FileTypeEnum.IMAGE.getExtensions().contains(FileNameUtil.extName(file.getOriginalFilename()))) {
-            uploadPretreatment.thumbnail(img -> img.size(100, 100));
+        UploadResp uploadResp;
+        try {
+            uploadResp = instance.upload(file.getOriginalFilename(), null, file.getInputStream(), file
+                .getContentType(), true);
+        } catch (IOException e) {
+            throw new BusinessException("文件上传失败", e);
         }
-        uploadPretreatment.setProgressMonitor(new ProgressListener() {
-            @Override
-            public void start() {
-                log.info("开始上传");
-            }
-
-            @Override
-            public void progress(long progressSize, Long allSize) {
-                log.info("已上传 [{}]，总大小 [{}]", progressSize, allSize);
-            }
-
-            @Override
-            public void finish() {
-                log.info("上传结束");
-            }
-        });
-        // 处理本地存储文件 URL
-        FileInfo fileInfo = uploadPretreatment.upload();
-        String domain = StrUtil.appendIfMissing(storage.getDomain(), StringConstants.SLASH);
-        fileInfo.setUrl(URLUtil.normalize(domain + fileInfo.getPath() + fileInfo.getFilename()));
-        return fileInfo;
+        return FileUploadResp.builder().url(uploadResp.getUrl()).build();
     }
 
     @Override
@@ -128,7 +82,7 @@ public class FileServiceImpl extends BaseServiceImpl<FileMapper, FileDO, FileRes
         if (CollUtil.isEmpty(storageIds)) {
             return 0L;
         }
-        return baseMapper.lambdaQuery().in(FileDO::getStorageId, storageIds).count();
+        return baseMapper.lambdaQuery().in(FileDO::getStorageCode, storageIds).count();
     }
 
     @Override
@@ -142,20 +96,5 @@ public class FileServiceImpl extends BaseServiceImpl<FileMapper, FileDO, FileRes
         resp.setSize(statisticsList.stream().mapToLong(FileStatisticsResp::getSize).sum());
         resp.setNumber(statisticsList.stream().mapToLong(FileStatisticsResp::getNumber).sum());
         return resp;
-    }
-
-    @Override
-    protected void fill(Object obj) {
-        super.fill(obj);
-        if (obj instanceof FileResp fileResp && !URLUtils.isHttpUrl(fileResp.getUrl())) {
-            StorageDO storage = storageService.getById(fileResp.getStorageId());
-            String prefix = StrUtil.appendIfMissing(storage.getDomain(), StringConstants.SLASH);
-            String url = URLUtil.normalize(prefix + fileResp.getUrl());
-            fileResp.setUrl(url);
-            String thumbnailUrl = StrUtils.blankToDefault(fileResp.getThumbnailUrl(), url, thUrl -> URLUtil
-                .normalize(prefix + thUrl));
-            fileResp.setThumbnailUrl(thumbnailUrl);
-            fileResp.setStorageName("%s (%s)".formatted(storage.getName(), storage.getCode()));
-        }
     }
 }
